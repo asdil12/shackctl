@@ -23,7 +23,7 @@
             <ul class="nav">
 			  {{ navlink('index', 'Home') }}
 			  {{ navlink('devices', 'Devices', ['device_new', 'device_edit']) }}
-			  {% if session.get('admin', False) %}{{ navlink('users', 'Users') }}{% endif %}
+			  {% if session.get('admin', False) %}{{ navlink('users', 'Users', ['user_new', 'user_edit']) }}{% endif %}
               <li><a href="http://github.com/asdil12/shackctl">Source</a></li>
             </ul>
             {% if not 'username' in session %}
