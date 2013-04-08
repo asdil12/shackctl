@@ -29,7 +29,7 @@ def remove(name):
 		return False
 	else:
 		del devices[name]
-		db.update(devices)
+		db.set(devices)
 		return True
 
 def list():

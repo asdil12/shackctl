@@ -32,7 +32,7 @@ def remove(name):
 		return False
 	else:
 		del users[name]
-		db.update(users)
+		db.set(users)
 		return True
 
 def list():
