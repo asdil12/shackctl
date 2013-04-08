@@ -55,8 +55,12 @@ def devices():
 				site_code = request.form.get('site_code')
 				device_code = request.form.get('device_code')
 				writeable = True if request.form.get('writeable') == 'on' else False
+				try:
+					power = dev.get(name).get('power')
+				except:
+					power = False
 				#FIXME: log
-				dev.set(name=name, title=title, site_code=site_code, device_code=device_code, writeable=writeable)
+				dev.set(name=name, title=title, site_code=site_code, device_code=device_code, writeable=writeable, power=power)
 				if action == 'add':
 					flash('Device "%s" created.' % (name), 'success')
 				else:
