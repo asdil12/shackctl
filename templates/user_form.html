@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block container %}
+<style type="text/css">
+	.table td {
+		vertical-align: middle;
+	}
+	table td input[type="text"], input[type="password"] {
+		width: 94%;
+	}
+</style>
+<div class="page-header">
+	<h1>{{ "Create User" if not user else "Edit '%s'" % name }}</h1>
+</div>
+
+<form method="POST" action="{{url_for('users')}}" class="form-inline" autocomplete="off">
+	<input type="submit" style="display: none;" /><!-- first submit is autoselected  -->
+	<table class="table table-striped table-condensed table-bordered" style="width: 400px;">
+		<tr>
+			<td style="width: 150px;">Username</td>
+			<td>
+				<input id="name" type="text" value="{{ name if user }}" {{ 'disabled="disabled"' if user else 'name="set"'|safe }} />
+				{% if user %}
+					<input type="hidden" name="set" value="{{name}}" />
+				{% else %}
+					 <script type="text/javascript">
+					   window.onload=function(){
+					      document.getElementById('name').value = '';
+					      document.getElementById('password').value = '';
+					    };
+					 </script>
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td>Password</td>
+			<td><input id="password" type="password" name="pass" value="" /></td>
+		</tr>
+		<tr>
+			<td>Is Admin</td>
+			<td><input type="checkbox" name="admin" {{ 'checked="checked"'|safe if user and user.admin else '' }} /></td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align: center; vertical-align: middle;">
+					{% if user %}
+						<input type="hidden" name="action" value="edit" />
+						<button class="btn btn-primary">Save</button>
+					{% else %}
+						<input type="hidden" name="action" value="add" />
+						<button class="btn btn-primary">Create</button>
+					{% endif %}
+			</td>
+		</tr>
+	</table>
+</form>
+{% endblock %}
