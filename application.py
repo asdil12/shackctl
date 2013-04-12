@@ -25,6 +25,10 @@ except:
 def index():
 	return render_template('base.html')
 
+@app.route('/charts')
+def charts():
+	return render_template('charts.html')
+
 @app.route('/devices', methods=['GET', 'POST'])
 def devices():
 	if request.method == 'GET':
