@@ -10,6 +10,8 @@ from flask import redirect
 from flask import request
 from flask import flash
 from flask import make_response
+from pysqlite2 import dbapi2 as sqlite3
+from datetime import datetime
 import auth
 import devices as dev
 
@@ -27,7 +29,27 @@ def index():
 
 @app.route('/charts')
 def charts():
-	return render_template('charts.html')
+	def formt_date(timestamp):
+		return datetime.fromtimestamp(timestamp).strftime("%H:%M")
+	limit = 12 * 24 * 2
+	conn = sqlite3.connect('chart.db')
+	c = conn.cursor()
+	temperatures = {'date': [], 'cpu': [], 'indoor': [], 'outdoor': []}
+	for row in c.execute('SELECT * FROM temperature ORDER BY timestamp LIMIT %i' % limit):
+		temperatures['date'].append(formt_date(row[0]))
+		temperatures['cpu'].append(row[1])
+		temperatures['indoor'].append(row[2])
+		temperatures['outdoor'].append(row[3])
+	loads = {'date': [], 'cpu': []}
+	for row in c.execute('SELECT * FROM load ORDER BY timestamp LIMIT %i' % limit):
+		loads['date'].append(formt_date(row[0]))
+		loads['cpu'].append(row[1])
+	mems = {'date': [], 'ram': [], 'swap': []}
+	for row in c.execute('SELECT * FROM memory ORDER BY timestamp LIMIT %i' % limit):
+		mems['date'].append(formt_date(row[0]))
+		mems['ram'].append(row[1])
+		mems['swap'].append(row[2])
+	return render_template('charts.html', temperatures=temperatures, loads=loads, mems=mems)
 
 @app.route('/devices', methods=['GET', 'POST'])
 def devices():
@@ -152,4 +174,4 @@ def logout():
 	return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=80)

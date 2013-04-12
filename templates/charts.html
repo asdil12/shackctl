@@ -46,19 +46,45 @@
 {{ chart('loadchart', [('#000099', 'CPU')]) }}
 
 <h2>Memory</h2>
-{{ chart('memchart', [('#000099', 'RAM')]) }}
+{{ chart('memchart', [
+	('#000099', 'RAM'),
+	('#990099', 'SWAP')
+])
+}}
 
 <script type="text/javascript">
 	new Ico.LineGraph(document.getElementById('tempchart'), {
-			red: [30, 5, 1, 10, 15, 18, 20, 25, 1],
-			green: [10, 9, 3, 30, 1, 10, 5, 33, 33],
-			blue: [5, 4, 10, 1, 30, 11, 33, 12, 22]
+			blue: {{ temperatures.cpu|tojson }},
+			red: {{ temperatures.indoor|tojson }},
+			green: {{ temperatures.outdoor|tojson }}
 		},
 		{
-			//markers: 'circle',
+			markers: 'circle',
 			colours: { red: '#990000', green: '#009900', blue: '#000099'},
-			//labels: ['one', 'two', 'three', 'four',
-			//	'five', 'six', 'seven', 'eight', 'nine'],
+			labels: {{ temperatures.date|tojson|safe }},
+			grid: true
+		}
+	);
+	new Ico.LineGraph(document.getElementById('loadchart'), {
+			blue: {{ loads.cpu|tojson }}
+		},
+		{
+			markers: 'circle',
+			colours: { red: '#990000', green: '#009900', blue: '#000099'},
+			labels: {{ loads.date|tojson|safe }},
+			grid: true,
+			label_count: 10,
+			label_step: 10
+		}
+	);
+	new Ico.LineGraph(document.getElementById('memchart'), {
+			blue: {{ mems.ram|tojson }},
+			red: {{ mems.swap|tojson }}
+		},
+		{
+			markers: 'circle',
+			colours: { red: '#990000', green: '#009900', blue: '#000099'},
+			labels: {{ mems.date|tojson|safe }},
 			grid: true
 		}
 	);
