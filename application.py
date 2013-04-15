@@ -11,7 +11,7 @@ from flask import request
 from flask import flash
 from flask import make_response
 from pysqlite2 import dbapi2 as sqlite3
-from datetime import datetime
+import time
 import auth
 import devices as dev
 
@@ -29,40 +29,24 @@ def index():
 
 @app.route('/charts')
 def charts():
-	def formt_date(timestamp):
-		return datetime.fromtimestamp(timestamp).strftime("%Hh")
-	def light_date(datelist, view=6):
-		i = view
-		for index, date in reversed(list(enumerate(datelist))):
-			if i != view:
-				datelist[index] = ''
-				i += 1
-			else:
-				i = 1
+	def format_date(timestamp):
+		return (timestamp - time.altzone) * 1000 # flot lib expects ms since 1970
 	limit = (12 * 24) * 2 # view datasets from n days
-	groupdown = (5 * 60) * 4 # group n datasets together
+	groupdown = (5 * 60) * 1 # group n datasets together
 	conn = sqlite3.connect('chart.db')
 	c = conn.cursor()
-	temperatures = {'date': [], 'cpu': [], 'indoor': [], 'outdoor': []}
-	for row in c.execute('SELECT * FROM (SELECT * FROM temperature ORDER BY timestamp DESC LIMIT %i) GROUP BY timestamp/%i ORDER BY timestamp' % (limit, groupdown)):
-		temperatures['date'].append(formt_date(row[0]))
-		temperatures['cpu'].append(row[1])
-		temperatures['indoor'].append(row[2])
-		temperatures['outdoor'].append(row[3])
-	light_date(temperatures['date'])
-	loads = {'date': [], 'cpu': []}
-	i = 0
+	temperatures = {'cpu': [], 'indoor': [], 'outdoor': []}
+	for row in c.execute('SELECT * FROM (SELECT * FROM temperature ORDER BY timestamp DESC LIMIT %i) ORDER BY timestamp' % limit):
+		temperatures['cpu'].append([format_date(row[0]), row[1]])
+		temperatures['indoor'].append([format_date(row[0]), row[2]])
+		temperatures['outdoor'].append([format_date(row[0]), row[3]])
+	loads = {'cpu': []}
 	for row in c.execute('SELECT * FROM (SELECT * FROM load ORDER BY timestamp DESC LIMIT %i) GROUP BY timestamp/%i ORDER BY timestamp' % (limit, groupdown)):
-		loads['date'].append(formt_date(row[0]))
-		loads['cpu'].append(row[1])
-	light_date(loads['date'])
-	mems = {'date': [], 'ram': [], 'swap': []}
-	i = 0
+		loads['cpu'].append([format_date(row[0]), row[1]])
+	mems = {'ram': [], 'swap': []}
 	for row in c.execute('SELECT * FROM (SELECT * FROM memory ORDER BY timestamp DESC LIMIT %i) GROUP BY timestamp/%i ORDER BY timestamp' % (limit, groupdown)):
-		mems['date'].append(formt_date(row[0]))
-		mems['ram'].append(row[1])
-		mems['swap'].append(row[2])
-	light_date(mems['date'])
+		mems['ram'].append([format_date(row[0]), row[1]])
+		mems['swap'].append([format_date(row[0]), row[2]])
 	return render_template('charts.html', temperatures=temperatures, loads=loads, mems=mems)
 
 @app.route('/devices', methods=['GET', 'POST'])

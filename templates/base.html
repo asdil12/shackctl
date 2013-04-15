@@ -8,13 +8,14 @@
 	{%- endif %}
 {% endmacro %}
 
-{% block bootstrap_js_bottom %}
-{{super()}}
-{% endblock %}
-
 {% block title %}ShackCTL{% endblock %}
 
+{% block bootstrap_js_bottom %}{% endblock %}
+
 {% block body_content %}
+    {% block javascript %}
+        <script src="{{ url_for('static', filename='js/jquery.min.js') }}" type="text/javascript" charset="utf-8"></script>
+    {% endblock %}
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
