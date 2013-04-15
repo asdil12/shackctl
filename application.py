@@ -30,25 +30,39 @@ def index():
 @app.route('/charts')
 def charts():
 	def formt_date(timestamp):
-		return datetime.fromtimestamp(timestamp).strftime("%H:%M")
-	limit = 12 * 24 * 2
+		return datetime.fromtimestamp(timestamp).strftime("%Hh")
+	def light_date(datelist, view=6):
+		i = view
+		for index, date in reversed(list(enumerate(datelist))):
+			if i != view:
+				datelist[index] = ''
+				i += 1
+			else:
+				i = 1
+	limit = (12 * 24) * 2 # view datasets from n days
+	groupdown = (5 * 60) * 4 # group n datasets together
 	conn = sqlite3.connect('chart.db')
 	c = conn.cursor()
 	temperatures = {'date': [], 'cpu': [], 'indoor': [], 'outdoor': []}
-	for row in c.execute('SELECT * FROM temperature ORDER BY timestamp LIMIT %i' % limit):
+	for row in c.execute('SELECT * FROM (SELECT * FROM temperature ORDER BY timestamp DESC LIMIT %i) GROUP BY timestamp/%i ORDER BY timestamp' % (limit, groupdown)):
 		temperatures['date'].append(formt_date(row[0]))
 		temperatures['cpu'].append(row[1])
 		temperatures['indoor'].append(row[2])
 		temperatures['outdoor'].append(row[3])
+	light_date(temperatures['date'])
 	loads = {'date': [], 'cpu': []}
-	for row in c.execute('SELECT * FROM load ORDER BY timestamp LIMIT %i' % limit):
+	i = 0
+	for row in c.execute('SELECT * FROM (SELECT * FROM load ORDER BY timestamp DESC LIMIT %i) GROUP BY timestamp/%i ORDER BY timestamp' % (limit, groupdown)):
 		loads['date'].append(formt_date(row[0]))
 		loads['cpu'].append(row[1])
+	light_date(loads['date'])
 	mems = {'date': [], 'ram': [], 'swap': []}
-	for row in c.execute('SELECT * FROM memory ORDER BY timestamp LIMIT %i' % limit):
+	i = 0
+	for row in c.execute('SELECT * FROM (SELECT * FROM memory ORDER BY timestamp DESC LIMIT %i) GROUP BY timestamp/%i ORDER BY timestamp' % (limit, groupdown)):
 		mems['date'].append(formt_date(row[0]))
 		mems['ram'].append(row[1])
 		mems['swap'].append(row[2])
+	light_date(mems['date'])
 	return render_template('charts.html', temperatures=temperatures, loads=loads, mems=mems)
 
 @app.route('/devices', methods=['GET', 'POST'])
