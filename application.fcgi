@@ -1,5 +1,6 @@
 #!/usr/bin/python2
 from flup.server.fcgi import WSGIServer
+from wsgigzip import GzipMiddleware
 from application import app
 import os
 
@@ -8,4 +9,5 @@ os.chdir(cwd)
 
 if __name__ == '__main__':
 	app.debug = True
+	app = GzipMiddleware(app)
 	WSGIServer(app).run()
