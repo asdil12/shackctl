@@ -33,7 +33,7 @@ def charts():
 		return (timestamp - time.altzone) * 1000 # flot lib expects ms since 1970
 	limit = (12 * 24) * 2 # view datasets from n days
 	groupdown = (5 * 60) * 1 # group n datasets together
-	conn = sqlite3.connect('chart.db')
+	conn = sqlite3.connect('database/chart.db')
 	c = conn.cursor()
 	temperatures = {'cpu': [], 'indoor': [], 'outdoor': []}
 	for row in c.execute('SELECT * FROM (SELECT * FROM temperature ORDER BY timestamp DESC LIMIT %i) ORDER BY timestamp' % limit):

@@ -5,9 +5,10 @@ import os
 from pysqlite2 import dbapi2 as sqlite3
 from time import time
 import psutil
+import shutil
 import json
 
-conn = sqlite3.connect('chart.db')
+conn = sqlite3.connect('database/chart.db')
 c = conn.cursor()
 
 if len(sys.argv) > 1 and sys.argv[1] == 'init':
