@@ -1,0 +1,15 @@
+{
+	"w1": {
+		"sensors": {
+			"indoor": "28-000004aa5bc5",
+			"outdoor": false
+		}
+	},
+	"ec3k": {
+		"sensors": {
+			"powersupply_12v": "35CA"
+		},
+		"fs_dir": "/tmp/ec3kfs"
+	},
+	"cache_dir": "/tmp/shackctl_chart_cache"
+}

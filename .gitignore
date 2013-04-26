@@ -1,4 +1,4 @@
 *.pyc
 secret.key
 chart.db
-sensors.json
+chartdb.json
