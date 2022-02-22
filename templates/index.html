@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script type="text/javascript">
+function set_relais_power(board, relais, power) {
+	var xhr = new XMLHttpRequest();
+	xhr.open('PUT', '/relais/'+board+'/'+relais)
+	xhr.onload = function() {
+		if (xhr.readyState != 4 || xhr.status != "200") {
+			alert("Fehler: Kann Relais nicht schalten!");
+		}
+		location.reload();
+	}
+	xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xhr.send("power="+power);
+}
+
+function set_wol_power(mac) {
+	var xhr = new XMLHttpRequest();
+	xhr.open('PUT', '/wol/'+mac)
+	xhr.onload = function() {
+		if (xhr.readyState != 4 || xhr.status != "200") {
+			alert("Fehler: Kann WOL nicht auslösen!");
+		}
+		location.reload();
+	}
+	xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xhr.send("power=1");
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<h2>Relais</h2>
+<table>
+	<tr>
+		<th>Relais</th>
+		<td style="width: 1em;">Status</td>
+		<td style="width: 1em;">Aktion</td>
+	</tr>
+	{% for relais in all_relais %}
+	<tr>
+		<td>{{ relais.name }}</td>
+		<td style="font-weight: bold;">{{ 'An' if relais.power else 'Aus' }}</td>
+		<td>
+			<button onclick="set_relais_power('{{relais.board}}', '{{relais.relais}}', {{(not relais.power)|int}});">{{ 'Ausschalten' if relais.power else 'Einschalten' }}</button>
+		</td>
+	</tr>
+	{% endfor %}
+</table>
+
+<h2>Wake on LAN</h2>
+<table>
+	<tr>
+		<th>Name</th>
+		<td style="width: 1em;">Aktion</td>
+	</tr>
+	{% for wol in all_wol %}
+	<tr>
+		<td>{{ wol.name }}</td>
+		<td><button onclick="set_wol_power('{{wol.mac}}');">{{ 'Wake on LAN' }}</button></td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}

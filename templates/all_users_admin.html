@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script type="text/javascript">
+function new_user() {
+	location.href = "{{ url_for('new_user')}}";
+}
+function edit_user(name) {
+	location.href = '/user/'+name;
+}
+function delete_user(name) {
+	if(!confirm("User wirklich entfernen?"))
+		return;
+	var xhr = new XMLHttpRequest();
+	xhr.open('DELETE', '/user/'+name)
+	xhr.onload = function() {
+		if (xhr.readyState != 4 || xhr.status != "200") {
+			alert("Fehler: Kann User nicht entfernen!");
+		}
+		location.reload();
+	}
+	xhr.send();
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<h2>Users</h2>
+<table>
+	<tr>
+		<th>Name</th>
+		<td style="width: 1em;">Admin</td>
+		<td style="width: 1%;" colspan="2">Aktionen</td>
+	</tr>
+	{% for user in all_users %}
+	<tr>
+		<td>{{ user.name }}</td>
+		<td>{{ user.isadmin }}</td>
+		<td><button onclick="edit_user('{{user.name}}');">Bearbeiten</button></td>
+		<td><button onclick="delete_user('{{user.name}}');">Entfernen</button></td>
+	</tr>
+	{% endfor %}
+</table>
+<a href="{{ url_for('new_user') }}">Hinzufügen</a>
+{% endblock %}

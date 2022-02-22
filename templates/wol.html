@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+<h2>Wake on LAN Einstellungen</h2>
+<form method="POST">
+<table>
+	<tr>
+		<th>Name</th>
+		<td><input type="text" name="name" value="{{ name }}" /></td>
+	</tr>
+	<tr>
+		<th>MAC</th>
+		<td><input type="text" name="mac" value="{{ mac }}" /></td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align: center;"><input type="submit" value="Speichern" /></td>
+	</tr>
+</table>
+</form>
+{% endblock %}

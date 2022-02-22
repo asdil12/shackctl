@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script type="text/javascript">
+function new_relais() {
+	location.href = "{{ url_for('new_relais')}}";
+}
+function edit_relais(board, relais) {
+	location.href = '/relais/'+board+'/'+relais;
+}
+function delete_relais(board, relais) {
+	if(!confirm("Relais wirklich entfernen?"))
+		return;
+	var xhr = new XMLHttpRequest();
+	xhr.open('DELETE', '/relais/'+board+'/'+relais)
+	xhr.onload = function() {
+		if (xhr.readyState != 4 || xhr.status != "200") {
+			alert("Fehler: Kann Relais nicht entfernen!");
+		}
+		location.reload();
+	}
+	xhr.send();
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<h2>Relais</h2>
+<table>
+	<tr>
+		<th>Relais</th>
+		<td style="width: 1em;">Board</td>
+		<td style="width: 1em;">Ausgang</td>
+		<td style="width: 1%;" colspan="2">Aktionen</td>
+	</tr>
+	{% for relais in all_relais %}
+	<tr>
+		<td>{{ relais.name }}</td>
+		<td>{{ relais.board}}</td>
+		<td>{{ relais.relais}}</td>
+		<td><button onclick="edit_relais('{{relais.board}}', '{{relais.relais}}');">Bearbeiten</button></td>
+		<td><button onclick="delete_relais('{{relais.board}}', '{{relais.relais}}');">Entfernen</button></td>
+	</tr>
+	{% endfor %}
+</table>
+<a href="{{ url_for('new_relais') }}">Hinzufügen</a>
+{% endblock %}

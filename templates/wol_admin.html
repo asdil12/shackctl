@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script type="text/javascript">
+function new_wol() {
+	location.href = "{{ url_for('new_wol')}}";
+}
+function edit_wol(mac) {
+	location.href = '/wol/'+mac;
+}
+function delete_wol(mac) {
+	if(!confirm("Relais wirklich entfernen?"))
+		return;
+	var xhr = new XMLHttpRequest();
+	xhr.open('DELETE', '/wol/'+mac)
+	xhr.onload = function() {
+		if (xhr.readyState != 4 || xhr.status != "200") {
+			alert("Fehler: Kann Gerät nicht entfernen!");
+		}
+		location.reload();
+	}
+	xhr.send();
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<h2>Wake on LAN Geräte</h2>
+<table>
+	<tr>
+		<td>Name</td>
+		<td>MAC</td>
+		<td style="width: 1%;" colspan="2">Aktionen</td>
+	</tr>
+	{% for wol in all_wol %}
+	<tr>
+		<td>{{ wol.name }}</td>
+		<td>{{ wol.mac }}</td>
+		<td><button onclick="edit_wol('{{wol.mac}}');">Bearbeiten</button></td>
+		<td><button onclick="delete_wol('{{wol.mac}}');">Entfernen</button></td>
+	</tr>
+	{% endfor %}
+</table>
+<a href="{{ url_for('new_wol') }}">Hinzufügen</a>
+{% endblock %}

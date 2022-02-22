@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+<h2>Relais Einstellungen</h2>
+<form method="POST">
+<table>
+	<tr>
+		<th title="Nummer der Relaisplatine (Start bei 0)">Board</th>
+		<td><input type="text" name="board" value="{{ board }}" /></td>
+	</tr>
+	<tr>
+		<th title="Nummer des Relais auf der Platine (1 bis 8)">Ausgang</th>
+		<td><input type="text" name="relais" value="{{ relais }}" /></td>
+	</tr>
+	<tr>
+		<th>Name</th>
+		<td><input type="text" name="name" value="{{ name }}" /></td>
+	</tr>
+	<tr>
+		<input type="hidden" name="power" value="{{ power|int }}" />
+		<td colspan="2" style="text-align: center;"><input type="submit" value="Speichern" /></td>
+	</tr>
+</table>
+</form>
+{% endblock %}

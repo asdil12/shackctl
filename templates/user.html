@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+<h2>User Einstellungen</h2>
+<form method="POST">
+<table>
+	<tr>
+		<th>Name</th>
+		<td><input type="text" name="name" value="{{ name }}" /></td>
+	</tr>
+	<tr>
+		<th>Passwort</th>
+		<td><input type="password" name="passwd" value="" /></td>
+	</tr>
+	<tr>
+		<th>Admin</th>
+		<td><input type="checkbox" name="isadmin" value="1" {{ "checked" if isadmin }} /></td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align: center;"><input type="submit" value="Speichern" /></td>
+	</tr>
+</table>
+</form>
+{% endblock %}
