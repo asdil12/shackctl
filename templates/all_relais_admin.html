@@ -31,13 +31,15 @@ function delete_relais(board, relais) {
 		<th>Relais</th>
 		<td style="width: 1em;">Board</td>
 		<td style="width: 1em;">Ausgang</td>
+		<td style="width: 1em;">Gruppe</td>
 		<td style="width: 1%;" colspan="2">Aktionen</td>
 	</tr>
 	{% for relais in all_relais %}
 	<tr>
 		<td>{{ relais.name }}</td>
-		<td>{{ relais.board}}</td>
-		<td>{{ relais.relais}}</td>
+		<td>{{ relais.board }}</td>
+		<td>{{ relais.relais }}</td>
+		<td>{{ relais.exgroup }}</td>
 		<td><button onclick="edit_relais('{{relais.board}}', '{{relais.relais}}');">Bearbeiten</button></td>
 		<td><button onclick="delete_relais('{{relais.board}}', '{{relais.relais}}');">Entfernen</button></td>
 	</tr>

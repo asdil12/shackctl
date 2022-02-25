@@ -20,6 +20,10 @@
 		<td><input type="text" name="name" value="{{ name }}" /></td>
 	</tr>
 	<tr>
+		<th title="Nummer der exklusiven Gruppe - nur ein Relais pro Gruppe kann an sein (0 zum deaktivieren)">Gruppe</th>
+		<td><input type="text" name="exgroup" value="{{ exgroup }}" /></td>
+	</tr>
+	<tr>
 		<input type="hidden" name="power" value="{{ power|int }}" />
 		<td colspan="2" style="text-align: center;"><input type="submit" value="Speichern" /></td>
 	</tr>

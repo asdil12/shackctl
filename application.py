@@ -21,10 +21,8 @@ auth = HTTPBasicAuth(realm='SHACK')
 class AuthError(Exception):
 	pass
 
-
 def pw_hash(pw):
 	return sha256(pw.encode()).hexdigest()
-
 
 def get_user(user):
 	conn = sql_connection()
@@ -42,7 +40,6 @@ def get_user(user):
 		conn.close()
 		raise AuthError('Username or Password wrong')
 
-
 @auth.verify_password
 def check_user_password(user, password):
 	try:
@@ -59,7 +56,7 @@ def sql_connection():
 	conn = sqlite3.connect(db_file)
 	c = conn.cursor()
 	if do_init:
-		c.execute("CREATE TABLE relais (board INTEGER, relais INTEGER, name TEXT, power INTEGER)")
+		c.execute("CREATE TABLE relais (board INTEGER, relais INTEGER, name TEXT, power INTEGER, exgroup INTEGER)")
 		c.execute("CREATE TABLE users (name TEXT, pass TEXT, admin INTEGER)")
 		c.execute("CREATE TABLE wol (name TEXT, mac TEXT)")
 		conn.commit()
@@ -107,17 +104,27 @@ def get_all_users():
 	conn.close()
 
 
-def set_relais(board: int, relais: int, name: str, power: bool):
+def set_relais(board: int, relais: int, name: str, power: bool, exgroup: int):
 	del_relais(board, relais)
 	conn = sql_connection()
 	c = conn.cursor()
-	c.execute('INSERT INTO relais VALUES (?,?,?,?)', (board, relais, name, int(power)))
+	c.execute('INSERT INTO relais VALUES (?,?,?,?,?)', (board, relais, name, int(power), exgroup))
 	conn.commit()
 	conn.close()
 
 def set_relais_power(board: int, relais: int, power: bool):
-	name = get_relais(board, relais)['name']
-	print("-> Setting relais %i on board %i to status %s - name: %s" % (relais, board, power, name))
+	r = get_relais(board, relais)
+	for r2 in get_all_relais():
+		# set relais in same exclusive group to 0
+		if r['exgroup'] and r2['exgroup'] == r['exgroup']:
+			print("-> Setting relais %i on board %i to status %s - name: %s" % (r2['relais'], r2['board'], False, r2['name']))
+			lib8relind.set(r2['board'], r2['relais'], int(False))
+			conn = sql_connection()
+			c = conn.cursor()
+			c.execute('UPDATE relais SET power=? WHERE board=? AND relais=?', (False, r2['board'], r2['relais']))
+			conn.commit()
+			conn.close()
+	print("-> Setting relais %i on board %i to status %s - name: %s" % (relais, board, power, r['name']))
 	lib8relind.set(board, relais, int(power))
 	conn = sql_connection()
 	c = conn.cursor()
@@ -136,25 +143,27 @@ def get_relais(board: int, relais: int):
 	conn = sql_connection()
 	c = conn.cursor()
 	c.execute('SELECT * FROM relais WHERE board=? AND relais=?', (board, relais))
-	board, relais, name, power = c.fetchone()
+	board, relais, name, power, exgroup = c.fetchone()
 	conn.close()
 	return {
 		'board': board,
 		'relais': relais,
 		'name': name,
 		'power': bool(power),
+		'exgroup': exgroup,
 	}
 
 def get_all_relais():
 	conn = sql_connection()
 	c = conn.cursor()
 	c.execute('SELECT * FROM relais ORDER BY board, relais')
-	for board, relais, name, power in c.fetchall():
+	for board, relais, name, power, exgroup in c.fetchall():
 		yield {
 			'board': board,
 			'relais': relais,
 			'name': name,
 			'power': bool(power),
+			'exgroup': exgroup,
 		}
 	conn.close()
 
@@ -250,6 +259,7 @@ def new_relais():
 			int(request.form['relais']),
 			request.form['name'],
 			bool(int(request.form['power'])),
+			int(request.form['exgroup']),
 		)
 		return redirect(url_for('relais_admin'))
 
@@ -268,6 +278,7 @@ def edit_relais(board, relais):
 			int(request.form['relais']),
 			request.form['name'],
 			bool(request.form['power']),
+			int(request.form['exgroup']),
 		)
 		return redirect(url_for('relais_admin'))
 	elif request.method == 'PUT':

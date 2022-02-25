@@ -35,12 +35,14 @@ function set_wol_power(mac) {
 <table>
 	<tr>
 		<th>Relais</th>
+		<td style="width: 1em;">Gruppe</td>
 		<td style="width: 1em;">Status</td>
 		<td style="width: 1em;">Aktion</td>
 	</tr>
 	{% for relais in all_relais %}
 	<tr>
 		<td>{{ relais.name }}</td>
+		<td>{{ relais.exgroup }}</td>
 		<td style="font-weight: bold;">{{ 'An' if relais.power else 'Aus' }}</td>
 		<td>
 			<button onclick="set_relais_power('{{relais.board}}', '{{relais.relais}}', {{(not relais.power)|int}});">{{ 'Ausschalten' if relais.power else 'Einschalten' }}</button>
